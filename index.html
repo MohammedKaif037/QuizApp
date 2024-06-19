@@ -9,8 +9,10 @@
 <body>
     <div class="container">
         <h1>QuizWiz</h1>
-        <nav>
-            <label for="trivia_amount">Number of Questions:</label>
+        <nav class="responsive-nav">
+            <div class="nav-wrapper">
+                <!-- Form elements here -->
+                <label for="trivia_amount">Number of Questions:</label>
             <select id="trivia_amount" class="form-control">
                 <option value="10">10</option>
                 <option value="20">20</option>
@@ -64,7 +66,9 @@
             </select>
 
             <button id="start-quiz-btn" class="btn btn-primary">Start Quiz</button>
+            </div>
         </nav>
+         
         <div id="quiz-container">
             <div id="timer"></div>
             <div id="questions-list"></div>

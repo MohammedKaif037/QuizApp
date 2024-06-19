@@ -8,13 +8,13 @@ body {
 
 @keyframes gradientAnimation {
   0% {
-      background-position: 0% 50%;
+    background-position: 0% 50%;
   }
   50% {
-      background-position: 100% 50%;
+    background-position: 100% 50%;
   }
   100% {
-      background-position: 0% 50%;
+    background-position: 0% 50%;
   }
 }
 
@@ -34,12 +34,12 @@ body {
 
 @keyframes slideInAnimation {
   0% {
-      transform: translateY(-100%);
-      opacity: 0;
+    transform: translateY(-100%);
+    opacity: 0;
   }
   100% {
-      transform: translateY(0);
-      opacity: 1;
+    transform: translateY(0);
+    opacity: 1;
   }
 }
 
@@ -60,6 +60,7 @@ nav label {
 nav select,
 nav button {
   margin-right: 10px;
+  margin-bottom: 10px; /* Add margin-bottom for mobile */
   padding: 5px 10px;
   border-radius: 5px;
   border: none;
@@ -74,6 +75,22 @@ nav button:hover {
   background-color: #ff4d4d;
   cursor: pointer;
 }
+
+/* Media query for mobile devices */
+@media (max-width: 768px) {
+  nav {
+    flex-direction: column; /* Stack navigation elements vertically */
+    align-items: center; /* Center navigation elements */
+  }
+
+  nav label,
+  nav select,
+  nav button {
+    margin-right: 0; /* Remove right margin */
+    margin-bottom: 10px; /* Add bottom margin for spacing */
+  }
+}
+
 
 /* Quiz Container Styles */
 #quiz-container {
