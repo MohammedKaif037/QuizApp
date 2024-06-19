@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Result</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Result</h1>
+        <h2 id="score"></h2>
+        <canvas id="confetti" class="confetti"></canvas>
+        <button onclick="window.location.href='index.html'">Back to Quiz</button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const score = urlParams.get('score');
+            const total = urlParams.get('total');
+            document.getElementById('score').textContent = `You scored ${score} out of ${total}`;
+
+            // Confetti effect
+            const confettiCanvas = document.getElementById('confetti');
+            const confettiContext = confettiCanvas.getContext('2d');
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+
+            const confettiParticles = [];
+            const confettiCount = 300;
+
+            function createConfetti() {
+                for (let i = 0; i < confettiCount; i++) {
+                    confettiParticles.push({
+                        x: Math.random() * confettiCanvas.width,
+                        y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+                        r: (Math.random() * 10) + 1,
+                        d: (Math.random() * confettiCount) + 10,
+                        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                        tilt: Math.random() * 10,
+                        tiltAngleIncremental: (Math.random() * 0.07) + 0.05,
+                        tiltAngle: 0
+                    });
+                }
+            }
+
+            function drawConfetti() {
+                confettiContext.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+                confettiParticles.forEach((particle, index) => {
+                    confettiContext.beginPath();
+                    confettiContext.lineWidth = particle.r / 2;
+                    confettiContext.strokeStyle = particle.color;
+                    confettiContext.moveTo(particle.x + particle.tilt + (particle.r / 4), particle.y);
+                    confettiContext.lineTo(particle.x + particle.tilt, particle.y + particle.tilt + (particle.r / 4));
+                    confettiContext.stroke();
+                });
+
+                updateConfetti();
+            }
+
+            function updateConfetti() {
+                confettiParticles.forEach((particle, index) => {
+                    particle.tiltAngle += particle.tiltAngleIncremental;
+                    particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
+                    particle.x += Math.sin(particle.d);
+                    particle.tilt = Math.sin(particle.tiltAngle - (index / 3)) * 15;
+
+                    if (particle.y > confettiCanvas.height) {
+                        confettiParticles[index] = {
+                            x: Math.random() * confettiCanvas.width,
+                            y: -20,
+                            r: particle.r,
+                            d: particle.d,
+                            color: particle.color,
+                            tilt: particle.tilt,
+                            tiltAngleIncremental: particle.tiltAngleIncremental,
+                            tiltAngle: particle.tiltAngle
+                        };
+                    }
+                });
+            }
+
+            createConfetti();
+            setInterval(drawConfetti, 30);
+        });
+    </script>
+</body>
+</html>

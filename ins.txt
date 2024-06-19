@@ -1,0 +1,351 @@
+Give me styles.css apply multitude of colors,designs,effects,transitions,animations to all elemeent of the pages comprehensively
+in very detail
+index.html 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Website</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>QuizWiz</h1>
+        <nav>
+            <label for="trivia_amount">Number of Questions:</label>
+            <select id="trivia_amount" class="form-control">
+                <option value="10">10</option>
+                <option value="20">20</option>
+                <option value="30">30</option>
+                <option value="40">40</option>
+                <option value="50">50</option>
+            </select>
+
+            <label for="trivia_category">Category:</label>
+            <select id="trivia_category" class="form-control">
+                <option value="any">Any</option>
+                <option value="9">General Knowledge</option>
+                <option value="10">Entertainment: Books</option>
+                <option value="11">Entertainment: Film</option>
+                <option value="12">Entertainment: Music</option>
+                <option value="13">Entertainment: Musicals &amp; Theatres</option>
+                <option value="14">Entertainment: Television</option>
+                <option value="15">Entertainment: Video Games</option>
+                <option value="16">Entertainment: Board Games</option>
+                <option value="17">Science &amp; Nature</option>
+                <option value="18">Science: Computers</option>
+                <option value="19">Science: Mathematics</option>
+                <option value="20">Mythology</option>
+                <option value="21">Sports</option>
+                <option value="22">Geography</option>
+                <option value="23">History</option>
+                <option value="24">Politics</option>
+                <option value="25">Art</option>
+                <option value="26">Celebrities</option>
+                <option value="27">Animals</option>
+                <option value="28">Vehicles</option>
+                <option value="29">Entertainment: Comics</option>
+                <option value="30">Science: Gadgets</option>
+                <option value="31">Entertainment: Japanese Anime &amp; Manga</option>
+                <option value="32">Entertainment: Cartoon &amp; Animations</option>
+             </select>
+
+            <label for="trivia_difficulty">Difficulty:</label>
+            <select id="trivia_difficulty" class="form-control">
+                <option value="any">Any</option>
+                <option value="easy">Easy</option>
+                <option value="medium">Medium</option>
+                <option value="hard">Hard</option>
+            </select>
+
+            <label for="trivia_type">Type:</label>
+            <select id="trivia_type" class="form-control">
+                <option value="any">Any</option>
+                <option value="multiple">Multiple Choice</option>
+                <option value="boolean">True / False</option>
+            </select>
+
+            <button id="start-quiz-btn" class="btn btn-primary">Start Quiz</button>
+        </nav>
+        <div id="quiz-container">
+            <div id="timer"></div>
+            <div id="questions-list"></div>
+            <button id="submit-quiz-btn" class="btn btn-success" disabled>Submit</button>
+        </div>
+        <div id="result-container">
+            <h2 id="result-message"></h2>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
+result.html:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Result</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .confetti {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Result</h1>
+        <h2 id="score"></h2>
+        <canvas id="confetti" class="confetti"></canvas>
+        <button onclick="window.location.href='index.html'">Back to Quiz</button>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const score = urlParams.get('score');
+            const total = urlParams.get('total');
+            document.getElementById('score').textContent = `You scored ${score} out of ${total}`;
+
+            // Confetti effect
+            const confettiCanvas = document.getElementById('confetti');
+            const confettiContext = confettiCanvas.getContext('2d');
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+
+            const confettiParticles = [];
+            const confettiCount = 300;
+
+            function createConfetti() {
+                for (let i = 0; i < confettiCount; i++) {
+                    confettiParticles.push({
+                        x: Math.random() * confettiCanvas.width,
+                        y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+                        r: (Math.random() * 10) + 1,
+                        d: (Math.random() * confettiCount) + 10,
+                        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                        tilt: Math.random() * 10,
+                        tiltAngleIncremental: (Math.random() * 0.07) + 0.05,
+                        tiltAngle: 0
+                    });
+                }
+            }
+
+            function drawConfetti() {
+                confettiContext.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+                confettiParticles.forEach((particle, index) => {
+                    confettiContext.beginPath();
+                    confettiContext.lineWidth = particle.r / 2;
+                    confettiContext.strokeStyle = particle.color;
+                    confettiContext.moveTo(particle.x + particle.tilt + (particle.r / 4), particle.y);
+                    confettiContext.lineTo(particle.x + particle.tilt, particle.y + particle.tilt + (particle.r / 4));
+                    confettiContext.stroke();
+                });
+
+                updateConfetti();
+            }
+
+            function updateConfetti() {
+                confettiParticles.forEach((particle, index) => {
+                    particle.tiltAngle += particle.tiltAngleIncremental;
+                    particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
+                    particle.x += Math.sin(particle.d);
+                    particle.tilt = Math.sin(particle.tiltAngle - (index / 3)) * 15;
+
+                    if (particle.y > confettiCanvas.height) {
+                        confettiParticles[index] = {
+                            x: Math.random() * confettiCanvas.width,
+                            y: -20,
+                            r: particle.r,
+                            d: particle.d,
+                            color: particle.color,
+                            tilt: particle.tilt,
+                            tiltAngleIncremental: particle.tiltAngleIncremental,
+                            tiltAngle: particle.tiltAngle
+                        };
+                    }
+                });
+            }
+
+            createConfetti();
+            setInterval(drawConfetti, 30);
+        });
+    </script>
+</body>
+</html>
+js:
+const apiUrlBase = 'https://opentdb.com/api.php?amount=10&type=multiple';
+
+// DOM elements
+const questionsList = document.getElementById('questions-list');
+const resultMessage = document.getElementById('result-message');
+const resultContainer = document.getElementById('result-container');
+const triviaAmountInput = document.getElementById('trivia_amount');
+const triviaCategorySelect = document.getElementById('trivia_category');
+const triviaDifficultySelect = document.getElementById('trivia_difficulty');
+const triviaTypeSelect = document.getElementById('trivia_type');
+const startQuizBtn = document.getElementById('start-quiz-btn');
+const submitQuizBtn = document.getElementById('submit-quiz-btn');
+
+let questions = [];
+let score = 0;
+let timerInterval;
+
+// Generate API URL based on dropdown selections
+function generateApiUrl() {
+    const amount = triviaAmountInput.value;
+    const category = triviaCategorySelect.value !== 'any' ? `&category=${triviaCategorySelect.value}` : '';
+    const difficulty = triviaDifficultySelect.value !== 'any' ? `&difficulty=${triviaDifficultySelect.value}` : '';
+    const type = triviaTypeSelect.value !== 'any' ? `&type=${triviaTypeSelect.value}` : '';
+
+    return `https://opentdb.com/api.php?amount=${amount}${category}${difficulty}${type}`;
+}
+
+// Fetch questions from the API
+function fetchQuestions() {
+    const apiUrl = generateApiUrl();
+
+    // Reset the score and hide the result container
+    score = 0;
+    resultContainer.style.display = 'none';
+    questionsList.innerHTML = '';
+
+    fetch(apiUrl)
+        .then(response => response.json())
+        .then(data => {
+            questions = data.results;
+            displayQuestions();
+            submitQuizBtn.disabled = false; // Enable the submit button after questions are fetched
+            startOverallTimer(questions.length); // Start the overall timer
+        })
+        .catch(error => {
+            console.error('Error fetching questions:', error);
+            resultMessage.textContent = 'An error occurred while fetching the questions.';
+            resultContainer.style.display = 'block';
+        });
+}
+
+// Display all questions on the page
+function displayQuestions() {
+    questionsList.innerHTML = '';
+    questions.forEach((questionData, questionIndex) => {
+        const questionDiv = document.createElement('div');
+        questionDiv.classList.add('question-block');
+        questionDiv.innerHTML = `
+            <h3>Question ${questionIndex + 1}</h3>
+            <p>${questionData.question}</p>
+            <div class="answers" id="answers${questionIndex}">
+                ${shuffleAnswers(questionData).map((answer, index) => `
+                    <label>
+                        <input type="radio" name="question${questionIndex}" value="${answer}">
+                        ${answer}
+                    </label>
+                `).join('')}
+            </div>
+        `;
+        questionsList.appendChild(questionDiv);
+    });
+}
+
+// Shuffle the answers
+function shuffleAnswers(questionData) {
+    const answers = [
+        questionData.correct_answer,
+        ...questionData.incorrect_answers
+    ];
+
+    for (let i = answers.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [answers[i], answers[j]] = [answers[j], answers[i]];
+    }
+
+    return answers;
+}
+
+// Check the user's answers and update the score
+function checkAnswers() {
+    score = 0;
+    questions.forEach((question, questionIndex) => {
+        const selectedAnswer = document.querySelector(`input[name="question${questionIndex}"]:checked`);
+        if (selectedAnswer && selectedAnswer.value === question.correct_answer) {
+            score++;
+        }
+    });
+
+    // Stop the timer
+    clearInterval(timerInterval);
+
+    // Disable all questions
+    disableAllQuestions();
+
+    // Reveal correct answers
+    revealCorrectAnswers();
+
+    // Navigate to the result page with score
+    window.location.href = `result.html?score=${score}&total=${questions.length}`;
+}
+
+// Reveal the correct answers beside each question
+function revealCorrectAnswers() {
+    questions.forEach((question, questionIndex) => {
+        const answersDiv = document.getElementById(`answers${questionIndex}`);
+        const correctAnswerLabel = document.createElement('p');
+        correctAnswerLabel.textContent = `Correct answer: ${question.correct_answer}`;
+        correctAnswerLabel.classList.add('correct-answer');
+        answersDiv.appendChild(correctAnswerLabel);
+    });
+}
+
+// Start the overall timer
+function startOverallTimer(numQuestions) {
+    const duration = numQuestions * 30; // 30 seconds per question
+    let timer = duration, minutes, seconds;
+    const timerElement = document.getElementById('timer');
+
+    clearInterval(timerInterval);
+    timerInterval = setInterval(() => {
+        minutes = parseInt(timer / 60, 10);
+        seconds = parseInt(timer % 60, 10);
+
+        minutes = minutes < 10 ? '0' + minutes : minutes;
+        seconds = seconds < 10 ? '0' + seconds : seconds;
+
+        timerElement.textContent = `${minutes}:${seconds}`;
+
+        if (--timer < 0) {
+            clearInterval(timerInterval);
+            disableAllQuestions();
+            submitQuizBtn.click();
+        }
+    }, 1000);
+}
+
+// Disable all questions when time is up or submitted
+function disableAllQuestions() {
+    const answerElements = document.querySelectorAll('.answers input');
+    answerElements.forEach(input => {
+        input.disabled = true;
+    });
+}
+
+// Event listeners
+startQuizBtn.addEventListener('click', (event) => {
+    fetchQuestions();
+});
+
+submitQuizBtn.addEventListener('click', (event) => {
+    checkAnswers();
+});
+
+// Load questions by default when the page loads
+window.onload = fetchQuestions;
+
+
+ 
