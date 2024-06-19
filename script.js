@@ -105,8 +105,10 @@ function checkAnswers() {
     // Reveal correct answers
     revealCorrectAnswers();
 
-    // Navigate to the result page with score
-    window.location.href = `result.html?score=${score}&total=${questions.length}`;
+    // Delay 10 seconds before navigating to the result page with score
+    setTimeout(() => {
+        window.location.href = `result.html?score=${score}&total=${questions.length}`;
+    }, 10000);
 }
 
 // Reveal the correct answers beside each question

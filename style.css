@@ -19,8 +19,7 @@ body {
 }
 
 .container {
- 
-  width: 100%;  
+  width: 100%;
   margin: 0 auto;
   padding: 20px;
   background: rgba(255, 255, 255, 0.2);
@@ -30,6 +29,7 @@ body {
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   animation: slideInAnimation 1s ease-out;
+  box-sizing: border-box;
 }
 
 @keyframes slideInAnimation {
@@ -99,7 +99,7 @@ nav button:hover {
   -webkit-backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.3);
   transition: transform 0.3s ease;
-  width: 100%;
+  box-sizing: border-box;
 }
 
 .question-block:hover {
@@ -175,7 +175,7 @@ nav button:hover {
   color: #ff6b6b;
   font-size: 36px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
- }
+}
 
 @keyframes scaleAnimation {
   0% {
@@ -204,4 +204,9 @@ button {
 button:hover {
   background-color: #0000cc;
   cursor: pointer;
+}
+.correct-answer {
+  font-weight: bold;
+  color: green;
+  margin-top: 10px;
 }
