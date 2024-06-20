@@ -1,5 +1,3 @@
-const apiUrlBase = 'https://opentdb.com/api.php?amount=10&type=multiple';
-
 // DOM elements
 const questionsList = document.getElementById('questions-list');
 const resultMessage = document.getElementById('result-message');
@@ -14,6 +12,7 @@ const submitQuizBtn = document.getElementById('submit-quiz-btn');
 let questions = [];
 let score = 0;
 let timerInterval;
+let isSecondClick = false;
 
 // Generate API URL based on dropdown selections
 function generateApiUrl() {
@@ -33,6 +32,7 @@ function fetchQuestions() {
     score = 0;
     resultContainer.style.display = 'none';
     questionsList.innerHTML = '';
+    isSecondClick = false;
 
     fetch(apiUrl)
         .then(response => response.json())
@@ -57,18 +57,25 @@ function displayQuestions() {
         questionDiv.classList.add('question-block');
         questionDiv.innerHTML = `
             <h3>Question ${questionIndex + 1}</h3>
-            <p>${questionData.question}</p>
+            <p>${decodeHtml(questionData.question)}</p>
             <div class="answers" id="answers${questionIndex}">
                 ${shuffleAnswers(questionData).map((answer, index) => `
                     <label>
-                        <input type="radio" name="question${questionIndex}" value="${answer}">
-                        ${answer}
+                        <input type="radio" name="question${questionIndex}" value="${decodeHtml(answer)}">
+                        ${decodeHtml(answer)}
                     </label>
                 `).join('')}
             </div>
         `;
         questionsList.appendChild(questionDiv);
     });
+}
+
+// Function to decode HTML entities
+function decodeHtml(html) {
+    const text = document.createElement('textarea');
+    text.innerHTML = html;
+    return text.value;
 }
 
 // Shuffle the answers
@@ -87,56 +94,43 @@ function shuffleAnswers(questionData) {
 }
 
 // Check the user's answers and update the score
-// Check the user's answers and update the score
 function checkAnswers() {
-    score = 0;
-    questions.forEach((question, questionIndex) => {
-        const selectedAnswer = document.querySelector(`input[name="question${questionIndex}"]:checked`);
-        if (selectedAnswer && selectedAnswer.value === question.correct_answer) {
-            score++;
-        }
-    });
+    if (!isSecondClick) {
+        score = 0;
+        questions.forEach((question, questionIndex) => {
+            const selectedAnswer = document.querySelector(`input[name="question${questionIndex}"]:checked`);
+            if (selectedAnswer && selectedAnswer.value === question.correct_answer) {
+                score++;
+            }
+        });
 
-    // Stop the timer
-    clearInterval(timerInterval);
+        // Stop the timer
+        clearInterval(timerInterval);
 
-    // Disable all questions
-    disableAllQuestions();
+        // Disable all questions
+        disableAllQuestions();
 
-    // Reveal correct answers
-    revealCorrectAnswers();
+        // Reveal correct answers
+        revealCorrectAnswers();
 
-    // Display the message
-    resultMessage.textContent = 'Answer is revealed. Click the submit button once again to redirect to result.html';
-    resultContainer.style.display = 'block';
+        // Display the message
+        resultMessage.textContent = 'Answer are revealed. Click the submit button once to check score';
+        resultContainer.style.display = 'block';
 
-    // Modify the submit button behavior for the second click
-    submitQuizBtn.textContent = 'Submit';
-    submitQuizBtn.removeEventListener('click', checkAnswers);
-    submitQuizBtn.addEventListener('click', () => {
+        // Indicate that the next click should redirect
+        isSecondClick = true;
+    } else {
+        // Redirect to result page with score
         window.location.href = `result.html?score=${score}&total=${questions.length}`;
-    });
+    }
 }
-
-// Event listeners
-startQuizBtn.addEventListener('click', (event) => {
-    fetchQuestions();
-});
-
-submitQuizBtn.addEventListener('click', (event) => {
-    checkAnswers();
-});
-
-// Load questions by default when the page loads
-window.onload = fetchQuestions;
-
 
 // Reveal the correct answers beside each question
 function revealCorrectAnswers() {
     questions.forEach((question, questionIndex) => {
         const answersDiv = document.getElementById(`answers${questionIndex}`);
         const correctAnswerLabel = document.createElement('p');
-        correctAnswerLabel.textContent = `Correct answer: ${question.correct_answer}`;
+        correctAnswerLabel.textContent = `Correct answer: ${decodeHtml(question.correct_answer)}`;
         correctAnswerLabel.classList.add('correct-answer');
         answersDiv.appendChild(correctAnswerLabel);
     });
@@ -174,3 +168,14 @@ function disableAllQuestions() {
     });
 }
 
+// Event listeners
+startQuizBtn.addEventListener('click', (event) => {
+    fetchQuestions();
+});
+
+submitQuizBtn.addEventListener('click', (event) => {
+    checkAnswers();
+});
+
+// Load questions by default when the page loads
+window.onload = fetchQuestions;
