@@ -87,6 +87,7 @@ function shuffleAnswers(questionData) {
 }
 
 // Check the user's answers and update the score
+// Check the user's answers and update the score
 function checkAnswers() {
     score = 0;
     questions.forEach((question, questionIndex) => {
@@ -105,11 +106,30 @@ function checkAnswers() {
     // Reveal correct answers
     revealCorrectAnswers();
 
-    // Delay 10 seconds before navigating to the result page with score
-    setTimeout(() => {
+    // Display the message
+    resultMessage.textContent = 'Answer is revealed. Click the submit button once again to redirect to result.html';
+    resultContainer.style.display = 'block';
+
+    // Modify the submit button behavior for the second click
+    submitQuizBtn.textContent = 'Submit';
+    submitQuizBtn.removeEventListener('click', checkAnswers);
+    submitQuizBtn.addEventListener('click', () => {
         window.location.href = `result.html?score=${score}&total=${questions.length}`;
-    }, 10000);
+    });
 }
+
+// Event listeners
+startQuizBtn.addEventListener('click', (event) => {
+    fetchQuestions();
+});
+
+submitQuizBtn.addEventListener('click', (event) => {
+    checkAnswers();
+});
+
+// Load questions by default when the page loads
+window.onload = fetchQuestions;
+
 
 // Reveal the correct answers beside each question
 function revealCorrectAnswers() {
@@ -154,14 +174,3 @@ function disableAllQuestions() {
     });
 }
 
-// Event listeners
-startQuizBtn.addEventListener('click', (event) => {
-    fetchQuestions();
-});
-
-submitQuizBtn.addEventListener('click', (event) => {
-    checkAnswers();
-});
-
-// Load questions by default when the page loads
-window.onload = fetchQuestions;

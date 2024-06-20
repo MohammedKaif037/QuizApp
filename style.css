@@ -1,10 +1,16 @@
 /* General Styles */
 body {
   font-family: 'Montserrat', sans-serif;
-  background: linear-gradient(to right, #ff6b6b, #ffa500, #ffff00, #00ff00, #00ffff, #0000ff, #8b00ff);
+  background: linear-gradient(to right, 
+    #ffcccb, #ffe4b5, #ffffe0, #e0ffff, #e6e6fa, #f0e68c, #f5deb3, #fff0f5, 
+    #ffe4e1, #fafad2, #f0f8ff, #f5f5dc, #fff5ee, #f0fff0, #fffacd, #faebd7,
+    #faf0e6, #fdf5e6, #fffaf0, #f8f8ff, #f0ffff, #f5fffa, #fffff0, #f0f8ff, 
+    #fff8dc, #ffebcd, #ffdab9, #ffe4c4, #ffdead, #ffe4e1, #fff0f5, #ffe4b5
+  );
   background-size: 1400% 1400%;
   animation: gradientAnimation 30s ease infinite;
 }
+
 
 @keyframes gradientAnimation {
   0% {
