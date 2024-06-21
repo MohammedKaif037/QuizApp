@@ -200,8 +200,7 @@
             const score = parseInt(urlParams.get('score'), 10);
             const total = parseInt(urlParams.get('total'), 10);
             const percentage = Math.round((score / total) * 100);
-            const passFailMessage = score / total >= 0.5 ? 'Congratulations, you passed!' : 'Sorry, you failed. Better luck next time!';
-
+ 
             // Animate score
             let currentScore = 0;
             const scoreElement = document.getElementById('score');
