@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retake Quiz - QuizWiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Retake Quiz</h1>
+        <div id="quiz-container">
+            <div id="timer"></div>
+            <div id="questions-list"></div>
+            <button id="reveal-answers-btn" class="btn btn-warning">Reveal Answers</button>
+            <button id="submit-quiz-btn" class="btn btn-success" disabled>Submit</button>
+        </div>
+        <div id="result-container">
+            <h2 id="result-message"></h2>
+        </div>
+    </div>
+    <script>
+        const questionsList = document.getElementById('questions-list');
+        const resultMessage = document.getElementById('result-message');
+        const resultContainer = document.getElementById('result-container');
+        const submitQuizBtn = document.getElementById('submit-quiz-btn');
+        const revealAnswersBtn = document.getElementById('reveal-answers-btn');
+
+        let questions = [];
+        let score = 0;
+        let timerInterval;
+
+        function loadQuestions() {
+            const storedQuestions = localStorage.getItem('quizQuestions');
+            if (storedQuestions) {
+                questions = JSON.parse(storedQuestions);
+                displayQuestions();
+                submitQuizBtn.disabled = false; // Enable the submit button after questions are fetched
+                startOverallTimer(questions.length); // Start the overall timer
+            } else {
+                resultMessage.textContent = 'No previous quiz found to retake.';
+                resultContainer.style.display = 'block';
+            }
+        }
+
+        function displayQuestions() {
+            questionsList.innerHTML = '';
+            questions.forEach((questionData, questionIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question-block');
+                questionDiv.innerHTML = `
+                    <h3>Question ${questionIndex + 1}</h3>
+                    <p>${decodeHtml(questionData.question)}</p>
+                    <div class="answers" id="answers${questionIndex}">
+                        ${shuffleAnswers(questionData).map((answer, index) => `
+                            <label>
+                                <input type="radio" name="question${questionIndex}" value="${decodeHtml(answer)}">
+                                ${decodeHtml(answer)}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                questionsList.appendChild(questionDiv);
+            });
+        }
+
+        function decodeHtml(html) {
+            const text = document.createElement('textarea');
+            text.innerHTML = html;
+            return text.value;
+        }
+
+        function shuffleAnswers(questionData) {
+            const answers = [
+                questionData.correct_answer,
+                ...questionData.incorrect_answers
+            ];
+
+            for (let i = answers.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [answers[i], answers[j]] = [answers[j], answers[i]];
+            }
+
+            return answers;
+        }
+
+        function checkAnswers() {
+            score = 0;
+            questions.forEach((question, questionIndex) => {
+                const selectedAnswer = document.querySelector(`input[name="question${questionIndex}"]:checked`);
+                if (selectedAnswer && selectedAnswer.value === question.correct_answer) {
+                    score++;
+                }
+            });
+
+            clearInterval(timerInterval);
+
+            disableAllQuestions();
+
+            resultMessage.textContent = `Your score is ${score} out of ${questions.length}.`;
+            resultContainer.style.display = 'block';
+
+            window.location.href = `result.html?score=${score}&total=${questions.length}`;
+        }
+
+        function revealCorrectAnswers() {
+            questions.forEach((question, questionIndex) => {
+                const answersDiv = document.getElementById(`answers${questionIndex}`);
+                const correctAnswerLabel = document.createElement('p');
+                correctAnswerLabel.textContent = `Correct answer: ${decodeHtml(question.correct_answer)}`;
+                correctAnswerLabel.classList.add('correct-answer');
+                answersDiv.appendChild(correctAnswerLabel);
+            });
+        }
+
+        function startOverallTimer(numQuestions) {
+            const duration = numQuestions * 30; // 30 seconds per question
+            let timer = duration, minutes, seconds;
+            const timerElement = document.getElementById('timer');
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+
+                timerElement.textContent = `${minutes}:${seconds}`;
+
+                if (--timer < 0) {
+                    clearInterval(timerInterval);
+                    disableAllQuestions();
+                    submitQuizBtn.click();
+                }
+            }, 1000);
+        }
+
+        function disableAllQuestions() {
+            const answerElements = document.querySelectorAll('.answers input');
+            answerElements.forEach(input => {
+                input.disabled = true;
+            });
+        }
+
+        revealAnswersBtn.addEventListener('click', (event) => {
+            revealCorrectAnswers();
+        });
+
+        submitQuizBtn.addEventListener('click', (event) => {
+            checkAnswers();
+        });
+
+        window.onload = loadQuestions;
+    </script>
+</body>
+</html>

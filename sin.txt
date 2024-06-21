@@ -1,0 +1,337 @@
+result.html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz Result</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        #confetti-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        #score {
+            color: #ff6b6b;
+            font-size: 36px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+         }
+
+        @keyframes scaleAnimation {
+            0% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .pass {
+            color: green;
+        }
+
+        .fail {
+            color: red;
+        }
+
+        #share-buttons {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        #share-buttons a {
+            display: inline-block;
+            margin: 0 10px;
+            text-decoration: none;
+            color: #fff;
+            background-color: #3b5998; /* Facebook color */
+            padding: 10px 15px;
+            border-radius: 5px;
+        }
+
+        #share-buttons a.twitter {
+            background-color: #1da1f2; /* Twitter color */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Quiz Result</h1>
+        <h2 id="score"></h2>
+        <h3 id="percentage"></h3>
+        <h3 id="pass-fail-message"></h3>
+        <div id="share-buttons">
+            <a href="#" id="share-facebook">Share on Facebook</a>
+            <a href="#" class="twitter" id="share-twitter">Share on Twitter</a>
+        </div>
+        <button onclick="window.location.href='index.html'">Back to Quiz</button>
+        <button onclick="window.location.href='quiz.html'">Retake Quiz</button>
+        <canvas id="confetti" class="confetti"></canvas>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const score = parseInt(urlParams.get('score'), 10);
+            const total = parseInt(urlParams.get('total'), 10);
+            const percentage = Math.round((score / total) * 100);
+            const passFailMessage = score / total >= 0.5 ? 'Congratulations, you passed!' : 'Sorry, you failed. Better luck next time!';
+
+            // Animate score
+            let currentScore = 0;
+            const scoreElement = document.getElementById('score');
+            const interval = setInterval(() => {
+                scoreElement.textContent = `You scored ${currentScore} out of ${total}`;
+                if (currentScore === score) {
+                    clearInterval(interval);
+                } else {
+                    currentScore++;
+                }
+            }, 30);
+
+            document.getElementById('percentage').textContent = `Percentage: ${percentage}%`;
+            document.getElementById('pass-fail-message').textContent = passFailMessage;
+            document.getElementById('pass-fail-message').className = score / total >= 0.5 ? 'pass' : 'fail';
+
+            // Share buttons
+            const shareFacebook = document.getElementById('share-facebook');
+            const shareTwitter = document.getElementById('share-twitter');
+            const resultMessage = `I scored ${score} out of ${total} (${percentage}%) in the quiz!`;
+
+            shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=${encodeURIComponent(resultMessage)}`;
+            shareTwitter.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultMessage)}`;
+
+            // Confetti effect
+            const confettiCanvas = document.getElementById('confetti');
+            const confettiContext = confettiCanvas.getContext('2d');
+            confettiCanvas.width = window.innerWidth;
+            confettiCanvas.height = window.innerHeight;
+
+            const confettiParticles = [];
+            const confettiCount = 300;
+
+            function createConfetti() {
+                for (let i = 0; i < confettiCount; i++) {
+                    confettiParticles.push({
+                        x: Math.random() * confettiCanvas.width,
+                        y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+                        r: (Math.random() * 10) + 1,
+                        d: (Math.random() * confettiCount) + 10,
+                        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+                        tilt: Math.random() * 10,
+                        tiltAngleIncremental: (Math.random() * 0.07) + 0.05,
+                        tiltAngle: 0
+                    });
+                }
+            }
+
+            function drawConfetti() {
+                confettiContext.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+
+                confettiParticles.forEach((particle, index) => {
+                    confettiContext.beginPath();
+                    confettiContext.lineWidth = particle.r / 2;
+                    confettiContext.strokeStyle = particle.color;
+                    confettiContext.moveTo(particle.x + particle.tilt + (particle.r / 4), particle.y);
+                    confettiContext.lineTo(particle.x + particle.tilt, particle.y + particle.tilt + (particle.r / 4));
+                    confettiContext.stroke();
+                });
+
+                updateConfetti();
+            }
+
+            function updateConfetti() {
+                confettiParticles.forEach((particle, index) => {
+                    particle.tiltAngle += particle.tiltAngleIncremental;
+                    particle.y += (Math.cos(particle.d) + 3 + particle.r / 2) / 2;
+                    particle.x += Math.sin(particle.d);
+                    particle.tilt = Math.sin(particle.tiltAngle - (index / 3)) * 15;
+
+                    if (particle.y > confettiCanvas.height) {
+                        confettiParticles[index] = {
+                            x: Math.random() * confettiCanvas.width,
+                            y: -20,
+                            r: particle.r,
+                            d: particle.d,
+                            color: particle.color,
+                            tilt: particle.tilt,
+                            tiltAngleIncremental: particle.tiltAngleIncremental,
+                            tiltAngle: particle.tiltAngle
+                        };
+                    }
+                });
+            }
+
+            createConfetti();
+            setInterval(drawConfetti, 30);
+        });
+    </script>
+</body>
+</html>
+quiz.html:
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Retake Quiz - QuizWiz</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Retake Quiz</h1>
+        <div id="quiz-container">
+            <div id="timer"></div>
+            <div id="questions-list"></div>
+            <button id="submit-quiz-btn" class="btn btn-success" disabled>Submit</button>
+        </div>
+        <div id="result-container">
+            <h2 id="result-message"></h2>
+        </div>
+    </div>
+    <script>
+        const questionsList = document.getElementById('questions-list');
+        const resultMessage = document.getElementById('result-message');
+        const resultContainer = document.getElementById('result-container');
+        const submitQuizBtn = document.getElementById('submit-quiz-btn');
+
+        let questions = [];
+        let score = 0;
+        let timerInterval;
+        let isSecondClick = false;
+
+        function loadQuestions() {
+            const storedQuestions = localStorage.getItem('quizQuestions');
+            if (storedQuestions) {
+                questions = JSON.parse(storedQuestions);
+                displayQuestions();
+                submitQuizBtn.disabled = false; // Enable the submit button after questions are fetched
+                startOverallTimer(questions.length); // Start the overall timer
+            } else {
+                resultMessage.textContent = 'No previous quiz found to retake.';
+                resultContainer.style.display = 'block';
+            }
+        }
+
+        function displayQuestions() {
+            questionsList.innerHTML = '';
+            questions.forEach((questionData, questionIndex) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.classList.add('question-block');
+                questionDiv.innerHTML = `
+                    <h3>Question ${questionIndex + 1}</h3>
+                    <p>${decodeHtml(questionData.question)}</p>
+                    <div class="answers" id="answers${questionIndex}">
+                        ${shuffleAnswers(questionData).map((answer, index) => `
+                            <label>
+                                <input type="radio" name="question${questionIndex}" value="${decodeHtml(answer)}">
+                                ${decodeHtml(answer)}
+                            </label>
+                        `).join('')}
+                    </div>
+                `;
+                questionsList.appendChild(questionDiv);
+            });
+        }
+
+        function decodeHtml(html) {
+            const text = document.createElement('textarea');
+            text.innerHTML = html;
+            return text.value;
+        }
+
+        function shuffleAnswers(questionData) {
+            const answers = [
+                questionData.correct_answer,
+                ...questionData.incorrect_answers
+            ];
+
+            for (let i = answers.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [answers[i], answers[j]] = [answers[j], answers[i]];
+            }
+
+            return answers;
+        }
+
+        function checkAnswers() {
+            if (!isSecondClick) {
+                score = 0;
+                questions.forEach((question, questionIndex) => {
+                    const selectedAnswer = document.querySelector(`input[name="question${questionIndex}"]:checked`);
+                    if (selectedAnswer && selectedAnswer.value === question.correct_answer) {
+                        score++;
+                    }
+                });
+
+                clearInterval(timerInterval);
+
+                disableAllQuestions();
+
+                revealCorrectAnswers();
+
+                resultMessage.textContent = 'Answers are revealed. Click the submit button once more to check the score';
+                resultContainer.style.display = 'block';
+
+                isSecondClick = true;
+            } else {
+                window.location.href = `result.html?score=${score}&total=${questions.length}`;
+            }
+        }
+
+        function revealCorrectAnswers() {
+            questions.forEach((question, questionIndex) => {
+                const answersDiv = document.getElementById(`answers${questionIndex}`);
+                const correctAnswerLabel = document.createElement('p');
+                correctAnswerLabel.textContent = `Correct answer: ${decodeHtml(question.correct_answer)}`;
+                correctAnswerLabel.classList.add('correct-answer');
+                answersDiv.appendChild(correctAnswerLabel);
+            });
+        }
+
+        function startOverallTimer(numQuestions) {
+            const duration = numQuestions * 30; // 30 seconds per question
+            let timer = duration, minutes, seconds;
+            const timerElement = document.getElementById('timer');
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                minutes = parseInt(timer / 60, 10);
+                seconds = parseInt(timer % 60, 10);
+
+                minutes = minutes < 10 ? '0' + minutes : minutes;
+                seconds = seconds < 10 ? '0' + seconds : seconds;
+
+                timerElement.textContent = `${minutes}:${seconds}`;
+
+                if (--timer < 0) {
+                    clearInterval(timerInterval);
+                    disableAllQuestions();
+                    submitQuizBtn.click();
+                }
+            }, 1000);
+        }
+
+        function disableAllQuestions() {
+            const answerElements = document.querySelectorAll('.answers input');
+            answerElements.forEach(input => {
+                input.disabled = true;
+            });
+        }
+
+        submitQuizBtn.addEventListener('click', (event) => {
+            checkAnswers();
+        });
+
+        window.onload = loadQuestions;
+    </script>
+</body>
+</html>

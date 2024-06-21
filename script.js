@@ -25,6 +25,8 @@ function generateApiUrl() {
 }
 
 // Fetch questions from the API
+// Fetch questions from the API
+// Fetch questions from the API
 function fetchQuestions() {
     const apiUrl = generateApiUrl();
 
@@ -38,6 +40,7 @@ function fetchQuestions() {
         .then(response => response.json())
         .then(data => {
             questions = data.results;
+            localStorage.setItem('quizQuestions', JSON.stringify(questions)); // Save questions to localStorage
             displayQuestions();
             submitQuizBtn.disabled = false; // Enable the submit button after questions are fetched
             startOverallTimer(questions.length); // Start the overall timer
@@ -48,6 +51,8 @@ function fetchQuestions() {
             resultContainer.style.display = 'block';
         });
 }
+
+
 
 // Display all questions on the page
 function displayQuestions() {
@@ -95,34 +100,22 @@ function shuffleAnswers(questionData) {
 
 // Check the user's answers and update the score
 function checkAnswers() {
-    if (!isSecondClick) {
-        score = 0;
-        questions.forEach((question, questionIndex) => {
-            const selectedAnswer = document.querySelector(`input[name="question${questionIndex}"]:checked`);
-            if (selectedAnswer && selectedAnswer.value === question.correct_answer) {
-                score++;
-            }
-        });
+    score = 0;
+    questions.forEach((question, questionIndex) => {
+        const selectedAnswer = document.querySelector(`input[name="question${questionIndex}"]:checked`);
+        if (selectedAnswer && selectedAnswer.value === question.correct_answer) {
+            score++;
+        }
+    });
 
-        // Stop the timer
-        clearInterval(timerInterval);
+    clearInterval(timerInterval);
 
-        // Disable all questions
-        disableAllQuestions();
+    disableAllQuestions();
 
-        // Reveal correct answers
-        revealCorrectAnswers();
+    resultMessage.textContent = `Your score is ${score} out of ${questions.length}.`;
+    resultContainer.style.display = 'block';
 
-        // Display the message
-        resultMessage.textContent = 'Answer are revealed. Click the submit button once to check score';
-        resultContainer.style.display = 'block';
-
-        // Indicate that the next click should redirect
-        isSecondClick = true;
-    } else {
-        // Redirect to result page with score
-        window.location.href = `result.html?score=${score}&total=${questions.length}`;
-    }
+    window.location.href = `result.html?score=${score}&total=${questions.length}`;
 }
 
 // Reveal the correct answers beside each question
