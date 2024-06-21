@@ -67,25 +67,6 @@
             margin: 10px 0;
         }
 
-        #pass-fail-message {
-            font-size: 1.5em;
-            font-weight: bold;
-            margin: 20px 0;
-            padding: 10px;
-            border-radius: 10px;
-            transition: all 0.3s ease;
-        }
-
-        .pass {
-            background-color: rgba(0, 255, 0, 0.2);
-            color: #4ecca3;
-        }
-
-        .fail {
-            background-color: rgba(255, 0, 0, 0.2);
-            color: #ff6b6b;
-        }
-
         #share-buttons {
             margin-top: 30px;
         }
@@ -142,16 +123,6 @@
             z-index: -1;
         }
 
-        @keyframes floatAnimation {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-
-        .float {
-            animation: floatAnimation 4s ease-in-out infinite;
-        }
-
         @media (max-width: 600px) {
             .container {
                 padding: 20px;
@@ -169,10 +140,6 @@
                 font-size: 1.5em;
             }
 
-            #pass-fail-message {
-                font-size: 1.2em;
-            }
-
             #share-buttons a {
                 padding: 8px 16px;
                 font-size: 0.9em;
@@ -185,10 +152,9 @@
         <h1>Quiz Result</h1>
         <h2 id="score"></h2>
         <h3 id="percentage"></h3>
-        <h3 id="pass-fail-message"></h3>
         <div id="share-buttons">
-            <a href="#" id="share-facebook">Share on Facebook</a>
-            <a href="#" class="twitter" id="share-twitter">Share on Twitter</a>
+            <a href="#" target="_blank" id="share-facebook">Share on Facebook</a>
+            <a href="#" target="_blank" class="twitter" id="share-twitter">Share on Twitter</a>
         </div>
         <button onclick="window.location.href='index.html'">Back to Quiz</button>
         <button onclick="window.location.href='quiz.html'">Retake Quiz</button>
@@ -200,7 +166,7 @@
             const score = parseInt(urlParams.get('score'), 10);
             const total = parseInt(urlParams.get('total'), 10);
             const percentage = Math.round((score / total) * 100);
- 
+
             // Animate score
             let currentScore = 0;
             const scoreElement = document.getElementById('score');
@@ -214,18 +180,14 @@
             }, 30);
 
             document.getElementById('percentage').textContent = `Percentage: ${percentage}%`;
-            document.getElementById('pass-fail-message').textContent = passFailMessage;
-            document.getElementById('pass-fail-message').className = score / total >= 0.5 ? 'pass' : 'fail';
 
             // Share buttons
             const shareFacebook = document.getElementById('share-facebook');
             const shareTwitter = document.getElementById('share-twitter');
-            const resultMessage = `I scored ${score} out of ${total} (${percentage}%) in the quiz!`;
+            const resultMessage = `I scored ${score} out of ${total} in the quiz!`;
 
             shareFacebook.href = `https://www.facebook.com/sharer/sharer.php?u=${window.location.href}&quote=${encodeURIComponent(resultMessage)}`;
             shareTwitter.href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(resultMessage)}`;
-
-             
         });
     </script>
 </body>
